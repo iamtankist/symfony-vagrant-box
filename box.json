@@ -1,0 +1,9 @@
+{
+    "name"         : "example-box",
+    "host_ip"      : "192.168.66.1",
+    "guest_ip"     : "192.168.66.65",
+    "project_name" : "example",
+    "project_root" : "/var/www",
+    "hostname"     : "example.local",
+    "mysql_root"   : "root"
+}

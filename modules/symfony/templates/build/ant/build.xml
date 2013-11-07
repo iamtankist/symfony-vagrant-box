@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Project" default="build" basedir=".">
+
+    <exec executable="hostname" osfamily="unix" failifexecutionfails="false" outputproperty="env.HOSTNAMEEXEC"/>
+    <property name="env.HOSTNAME" value="${env.HOSTNAMEEXEC}"/>
+
+    <condition property="isDev">
+        <or>
+            <equals arg1="${user.name}" arg2="vagrant"/>
+        </or>
+    </condition>
+
+    <target name="build" depends="vendors-dev, permissions, cc, assets"/>
+
+    <target name="permissions" description="Fixes permissions (old way with the help of a shell script)">
+        <exec executable="sh" failonerror="true">
+            <arg value="build/permissions.sh"/>
+        </exec>
+    </target>
+
+    <target name="vendors-dev" if="isDev" description="Install vendors">
+        <exec executable="composer" failonerror="true">
+            <arg value="install"/>
+            <arg value="--dev"/>
+        </exec>
+    </target>
+
+    <target name="cc" description="Clear Cache">
+        <delete includeemptydirs="true">
+            <fileset dir="${basedir}/app/cache" includes="**/*"/>
+        </delete>
+        <delete includeemptydirs="true">
+            <fileset dir="${basedir}/app/logs" includes="**/*"/>
+        </delete>
+        <exec dir="${basedir}/bin" executable="php" failonerror="true">
+            <arg value="apc_cc.php"/>
+        </exec>
+    </target>
+
+    <target name="assets" description="Installs and dumps assets">
+        <exec dir="${basedir}/app" executable="php" failonerror="true">
+            <arg value="console"/>
+            <arg value="assets:install"/>
+            <arg value="--symlink"/>
+            <arg value="${basedir}/web"/>
+        </exec>
+        <exec dir="${basedir}/app" executable="php" failonerror="true">
+            <arg value="console"/>
+            <arg value="assetic:dump"/>
+        </exec>
+    </target>
+
+    <target name="whitelist" description="Whitelists IP as a development environment">
+        <exec dir="${basedir}" executable="echo" failonerror="true">
+            <arg value="${ip}"/>
+        </exec>
+        <replaceregexp file="${basedir}/web/app_dev.php"
+               match="array\((.*)\)\)"
+               replace="array\(\1, '${ip}'\)\)"
+        />
+        <replaceregexp file="${basedir}/web/config.php"
+               match="array\((.*)\)\)\)"
+               replace="array\(\1    '${ip}',${line.separator}\)\)\)"
+               flags="s"
+        />
+    </target>
+</project>
