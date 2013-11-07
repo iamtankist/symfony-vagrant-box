@@ -1,4 +1,4 @@
-# Project "Vagrapussy (Hulk Edition)"
+# Project "Vagrapupsy (Hulk Edition)"
 
 ## Overview
 
