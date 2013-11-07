@@ -91,7 +91,7 @@ augeas { "cli-php.ini_date":
 
 #### MYSQL
 class { 'mysql::server':
-  config_hash => { 'root_password' => $vagrant_mysql_root }
+    root_password => $vagrant_mysql_root,
 }
 
 #### Composer
